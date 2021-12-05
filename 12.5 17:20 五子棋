@@ -1,0 +1,84 @@
+package project;
+
+import java.util.Scanner;
+
+public class example {
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        int chess[][] = new int[15][15];
+        for (int i=0;i<chess.length;i++){
+            for (int j=0;j<chess[i].length;j++){
+                chess[i][j]=0;
+            }
+        }
+
+        int flag=0;
+
+        do {
+             int a = input.nextInt();
+             int b = input.nextInt();
+             int c = input.nextInt();
+
+             chess[a][b]=c;
+
+            for (int i=0;i<chess.length;i++){
+                for (int j=0;j<chess[i].length;j++){
+                    System.out.print(chess[i][j]+" ");
+                }
+                System.out.println("");
+            }
+
+            if (checktot(a,b,chess)){
+                flag=1;
+                System.out.println("you win");
+            }
+        }while (flag!=1);
+    }
+
+    private static boolean checkstep(int x, int y,int chess[][],int directx,int directy){
+        //direct表示搜索的方向 (1,0)表示搜索上下 (0,1)表示搜索左右 (1,1)表示搜索左上右下 (-1,1)表示搜索右上左下
+
+        int count = 0;
+        for (int i=1;i<5;i++){
+            int tempx = x;
+            int tempy = y;
+            tempx += i*directx;
+            tempy += i*directy;
+            if (chess[tempx][tempy]!=chess[x][y]){
+                break;
+            }
+            count++;
+        }
+        for (int i=1;i<5;i++){
+            int tempx = x;
+            int tempy = y;
+            tempx -= i*directx;
+            tempy -= i*directy;
+            if (chess[tempx][tempy]!=chess[x][y]){
+                break;
+            }
+            count++;
+        }
+
+        return count >= 4;
+
+    }
+
+    private static boolean checktot(int x, int y, int[][] chess){
+        if (checkstep(x,y,chess,1,0)){
+            return true;
+        }
+        if (checkstep(x,y,chess,0,1)){
+            return true;
+        }
+        if (checkstep(x,y,chess,1,1)){
+            return true;
+        }
+        if (checkstep(x,y,chess,-1,1)){
+            return true;
+        }
+        else return false;
+    }
+
+
+}
