@@ -1,0 +1,324 @@
+import edu.princeton.cs.algs4.StdDraw;
+import java.util.Scanner;
+
+public class testx {
+
+    public static void main(String[] args) {
+
+
+        StdDraw.setScale(-1,16);
+        StdDraw.setPenColor(StdDraw.PRINCETON_ORANGE);
+        StdDraw.filledRectangle(8,8,10,10);
+        Scanner input = new Scanner(System.in);
+
+        StdDraw.setPenColor(StdDraw.BLACK);
+        for (double i = 0; i < 15; i += 1) {
+            StdDraw.line(i+0.5, 14.5, i+0.5, 0.5);
+            StdDraw.line(14.5, i+0.5, 0.5, i+0.5);
+        }
+
+        int[][] chess = new int[15][15];
+        for (int i=0;i<chess.length;i++){
+            for (int j=0;j<chess[0].length;j++){
+                chess[i][j]=0;   //初始化棋盘
+            }
+        }
+
+        int flag=0;
+        int color = input.nextInt();  //用个String数组就可以表示黑/白 未完成
+        int counter=0;
+        int stop=0;
+
+        while (flag != 1){
+
+
+            if (color==1){   //玩家选择黑棋
+                if (StdDraw.isMousePressed()&&counter==0) {   //鼠标点击时
+
+                    StdDraw.setPenColor(StdDraw.BLACK);
+
+                    counter++;
+                    int a = (int) StdDraw.mouseX();
+                    int b = (int) StdDraw.mouseY();
+
+                    if (checkIfAgain(a, b, chess)) {    //判断当前位置有没有子
+                        System.out.println("Please choose another place to settle");
+                    }
+                    if(chess[a][b]==0){    //这里没有棋子，能下
+
+                        chess[a][b]=1;
+
+                        if (checkthreetot(a, b, chess)) {   //判断双三且不影响获胜
+                            chess[a][b] = 0;
+                            System.out.println("wrong location, try again");
+                        }
+                        else {
+                            StdDraw.filledCircle(a+0.5, b+0.5, 0.35);    //stdDraw的在这里打印
+                            for (int i = 0; i < chess.length; i++) {   //打印当前棋盘
+                                for (int j = 0; j < chess[0].length; j++) {
+                                    System.out.print(chess[i][j] + " ");
+                                }
+                                System.out.println();
+                            }
+                            System.out.println();
+
+
+                            if (checktot(a, b, chess)) {
+                                flag = 1;
+                                System.out.println(color+", you win");
+                            }
+                            else {   //轮到电脑
+                                for (int i=0;i<400;i++){
+                                    int tempa = (int) (Math.random() * 15);
+                                    int tempb = (int) (Math.random() * 15);
+                                    if (chess[tempa][tempb]==0){
+                                        chess[tempa][tempb]=2;   //java中
+
+                                        StdDraw.setPenColor(StdDraw.WHITE);   //stdDraw中
+                                        StdDraw.filledCircle(tempa+0.5, tempb+0.5, 0.35);    //stdDraw的在这里打印
+                                        for (int j = 0; j < chess.length; j++) {   //打印当前棋盘
+                                            for (int k = 0; k < chess[0].length; k++) {
+                                                System.out.print(chess[j][k] + " ");
+                                            }
+                                            System.out.println();
+                                        }
+                                        System.out.println();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if (!StdDraw.isMousePressed()) counter=0;
+            }
+
+            if (color==2){   //玩家选择白棋
+
+                if (stop==0){
+                    for (int i=0;i<400;i++){
+                        int tempa = (int) (Math.random() * 15);
+                        int tempb = (int) (Math.random() * 15);
+                        if (chess[tempa][tempb]==0){
+                            chess[tempa][tempb]=1;   //java中
+                            stop=1;   //
+                            
+                            StdDraw.setPenColor(StdDraw.BLACK);   //stdDraw中
+                            StdDraw.filledCircle(tempa+0.5, tempb+0.5, 0.35);    //stdDraw的在这里打印
+                            for (int j = 0; j < chess.length; j++) {   //打印当前棋盘
+                                for (int k = 0; k < chess[0].length; k++) {
+                                    System.out.print(chess[j][k] + " ");
+                                }
+                                System.out.println();
+                            }
+                            System.out.println();
+                            break;
+                        }
+                    }
+                }
+
+
+                else{
+                    if (StdDraw.isMousePressed()&&counter==0) {   //鼠标点击时
+                        StdDraw.setPenColor(StdDraw.WHITE);
+                        counter++;
+                        int a = (int) StdDraw.mouseX();
+                        int b = (int) StdDraw.mouseY();
+
+                        if (checkIfAgain(a, b, chess)) {    //判断当前位置有没有子
+                            System.out.println("Please choose another place to settle");
+                        }
+                        if(chess[a][b]==0){    //这里没有棋子，能下
+                            chess[a][b]=2;   //java中
+                            stop=0;   //
+
+                            StdDraw.filledCircle(a+0.5, b+0.5, 0.35);    //stdDraw的在这里打印
+                            for (int i = 0; i < chess.length; i++) {   //打印当前棋盘
+                                for (int j = 0; j < chess[0].length; j++) {
+                                    System.out.print(chess[i][j] + " ");
+                                }
+                                System.out.println();
+                            }
+                            System.out.println();
+                            if (checktot(a, b, chess)) {
+                                flag = 1;
+                                System.out.println(color+", you win");
+                            }
+                        }
+                    }
+                }
+                if (!StdDraw.isMousePressed()) counter=0;
+            }
+        }
+    }
+
+
+
+    private static boolean checkIfAgain(int x, int y, int[][] chess){   //判断当前位置有没有子
+        return chess[x][y]!=0;
+    }
+
+    private static boolean checkstep(int x, int y, int[][] chess, int directx, int directy){
+        //direct表示搜索的方向 (1,0)表示搜索上下 (0,1)表示搜索左右 (1,1)表示搜索左上右下 (-1,1)表示搜索右上左下
+
+        int count = 0;
+        for (int i=1;i<5;i++){
+            int tempx = x;
+            int tempy = y;
+            tempx += i*directx;
+            tempy += i*directy;
+            if(tempx<0||tempx>14||tempy<0||tempy>14){
+                break;
+            }
+            if (chess[tempx][tempy]!=chess[x][y]){
+                break;
+            }
+            if(chess[tempx][tempy]==chess[x][y]){
+                count++;
+            }
+
+        }
+        for (int i=1;i<5;i++){
+            int tempx = x;
+            int tempy = y;
+            tempx -= i*directx;
+            tempy -= i*directy;
+            if(tempx<0||tempx>14||tempy<0||tempy>14){
+                break;
+            }
+            if (chess[tempx][tempy]!=chess[x][y]){
+                break;
+            }
+            if(chess[tempx][tempy]==chess[x][y]){
+                count++;
+            }
+        }
+        return count >= 4;
+    }
+
+    private static boolean checktot(int x, int y, int[][] chess){
+        if (checkstep(x,y,chess,1,0)){
+            return true;
+        }
+        if (checkstep(x,y,chess,0,1)){
+            return true;
+        }
+        if (checkstep(x,y,chess,1,1)){
+            return true;
+        }
+        if (checkstep(x,y,chess,-1,1)){
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean checkthreestep(int x, int y, int[][] chess, int directx, int directy){    //检查双3的重复
+        //direct表示搜索的方向 (1,0)表示搜索上下 (0,1)表示搜索左右 (1,1)表示搜索左上右下 (-1,1)表示搜索右上左下
+
+        int count = 0;
+        int countblack = 0;
+        for (int i=1;i<3;i++){
+            int tempx = x;
+            int tempy = y;
+            tempx += i*directx;
+            tempy += i*directy;
+            if(tempx<0||tempx>14||tempy<0||tempy>14){
+                break;
+            }
+            if (chess[tempx][tempy]!=chess[x][y]){
+                break;
+            }
+            count++;
+        }
+        for (int i=1;i<3;i++){
+            int tempx = x;
+            int tempy = y;
+            tempx -= i*directx;
+            tempy -= i*directy;
+            if(tempx<0||tempx>14||tempy<0||tempy>14){
+                break;
+            }
+            if (chess[tempx][tempy]!=chess[x][y]){
+                break;
+            }
+            count++;
+        }
+        return count >= 2;
+    }
+    private static boolean checkthreestep2(int x, int y, int[][] chess, int directx, int directy){    //检查双3的重复
+        //direct表示搜索的方向 (1,0)表示搜索上下 (0,1)表示搜索左右 (1,1)表示搜索左上右下 (-1,1)表示搜索右上左下
+
+        int count = 0;
+        int countblack = 0;
+        for (int i=1;i<3;i++){
+            int tempx = x;
+            int tempy = y;
+            tempx += i*directx;
+            tempy += i*directy;
+            if(tempx<0||tempx>14||tempy<0||tempy>14){
+                break;
+            }
+            if(chess[tempx][tempy]!=chess[x][y]){
+                break;
+            }
+            if (chess[tempx][tempy]==chess[x][y]){
+                count++;
+            }
+            if(count==2){
+                int j = i+1;
+                int tempx1=x+j*directx;
+                int tempy1=y+j*directy;
+                if(tempx1<0||tempx1>14||tempy1<0||tempy1>14){
+                    break;
+                }
+                if(chess[tempx1][tempy1]!=0&&chess[tempx1][tempy1]!=chess[x][y]){
+                    countblack++;
+                }
+            }
+        }
+
+        for (int i=1;i<3;i++){
+            int tempx = x;
+            int tempy = y;
+            tempx -= i*directx;
+            tempy -= i*directy;
+            if(tempx<0||tempx>14||tempy<0||tempy>14){
+                break;
+            }
+            if(chess[tempx][tempy]!=chess[x][y]){
+                break;
+            }
+            if (chess[tempx][tempy]==chess[x][y]){
+                count++;
+            }
+            if(count==2){
+                int j = i+1;
+                int tempx1=x-j*directx;
+                int tempy1=y-j*directy;
+                if(tempx1<0||tempx1>14||tempy1<0||tempy1>14){
+                    break;
+                }
+                if(chess[tempx1][tempy1]!=0&&chess[tempx1][tempy1]!=chess[x][y]){
+                    countblack++;
+                }
+            }
+        }
+        return countblack == 0;
+    }
+    private static boolean checkthreetot(int x, int y, int[][] chess){    //若有两个方向大于等于3子
+        int tot = 0;
+        if (checkthreestep(x,y,chess,1,0)&&checkthreestep2(x,y,chess,1,0)){
+            tot++;
+        }
+        if (checkthreestep(x,y,chess,0,1)&&checkthreestep2(x,y,chess,0,1)){
+            tot++;
+        }
+        if (checkthreestep(x,y,chess,1,1)&&checkthreestep2(x,y,chess,1,1)){
+            tot++;
+        }
+        if (checkthreestep(x,y,chess,-1,1)&&checkthreestep2(x,y,chess,-1,1)){
+            tot++;
+        }
+        return tot >= 2;
+    }
+}
